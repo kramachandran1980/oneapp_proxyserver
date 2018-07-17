@@ -22,7 +22,9 @@ async def ws_connection(websocket, path):
         message = await websocket.recv()
         if message is None:
             break
-        print(message)
+        else:
+            print(message)
+            await sendtoSub(message)
 
 async def recvonSub():
     while True:
@@ -33,18 +35,19 @@ async def recvonSub():
         for ws in connections:
             await ws.send(received_msg)
         
-async def sendtoSub():
+async def sendtoSub(message):
     while True:
         await asyncio.sleep(1)
         print("Second Worker Executed")
-        await pub_socket.send_string("Sending to sub")
+        #await pub_socket.send_string(message)
+        await pub_socket.send(message)
 
 loop = asyncio.get_event_loop()
 try:
-    start_server = websockets.serve(ws_connection, 'localhost', 8765)
+    start_server = websockets.serve(ws_connection, '172.28.101.247', 8765)
     asyncio.ensure_future(start_server)
     asyncio.ensure_future(recvonSub())
-    asyncio.ensure_future(sendtoSub())
+    #asyncio.ensure_future(sendtoSub())
     loop.run_forever()
 except KeyboardInterrupt:
     pass

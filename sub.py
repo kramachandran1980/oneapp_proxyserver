@@ -12,11 +12,11 @@ pub_socket=context.socket(zmq.PUB)
 pub_socket.bind("tcp://127.0.0.1:5555")
 
 async def recvonSub():
-    while True:
-        await asyncio.sleep(1)
-        print("First Worker Executed")
-        received_msg = await socket_sub.recv()
-        print(received_msg)
+    #while True:
+    await asyncio.sleep(1)
+    print("First Worker Executed")
+    received_msg = await socket_sub.recv()
+    print(received_msg)
         
 async def sendtoSub():
     while True:
@@ -27,7 +27,7 @@ async def sendtoSub():
 loop = asyncio.get_event_loop()
 try:
     asyncio.ensure_future(recvonSub())
-    asyncio.ensure_future(sendtoSub())
+    #asyncio.ensure_future(sendtoSub())
     loop.run_forever()
 except KeyboardInterrupt:
     pass
