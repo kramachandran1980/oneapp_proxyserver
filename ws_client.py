@@ -41,14 +41,20 @@ test_str="{\
 async def hello():
     async with websockets.connect(
             'ws://localhost:8765') as websocket:
-        message = test_str 
+        while True: 
+            await asyncio.sleep(1)
+            message = "sending from websocket client"
+            await websocket.send(message)
+            print(f"> {message}")
+            response = await websocket.recv()
+            print(f"< {response}")
 
-        await websocket.send(message)
-        print(f"> {message}")
-
-        response = await websocket.recv()
-        print(f"< {response}")
-
-#while True:
-asyncio.get_event_loop().run_until_complete(hello())
-#asyncio.get_event_loop().run_forever()
+loop = asyncio.get_event_loop()
+try:
+    asyncio.ensure_future(hello())
+    loop.run_forever()
+except KeyboardInterrupt:
+    pass
+finally:
+    print("Closing Loop")
+    loop.close()

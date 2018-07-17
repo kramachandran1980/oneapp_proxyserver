@@ -1,59 +1,36 @@
-import sys
+import asyncio
+import time
 import zmq
+import zmq.asyncio
 
-port = "5555"
+context = zmq.asyncio.Context()
+socket_sub = context.socket(zmq.SUB)
+socket_sub.setsockopt_string(zmq.SUBSCRIBE, "")
+socket_sub.connect("tcp://127.0.0.1:6666")
 
-context = zmq.Context()
-socket = context.socket(zmq.SUB)
-socket.setsockopt_string(zmq.SUBSCRIBE, "")
 pub_socket=context.socket(zmq.PUB)
-pub_socket.bind("tcp://127.0.0.1:6666")
+pub_socket.bind("tcp://127.0.0.1:5555")
 
-socket.connect ("tcp://127.0.0.1:%s" % port)
+async def recvonSub():
+    while True:
+        await asyncio.sleep(1)
+        print("First Worker Executed")
+        received_msg = await socket_sub.recv()
+        print(received_msg)
+        
+async def sendtoSub():
+    while True:
+        await asyncio.sleep(1)
+        print("Second Worker Executed")
+        await pub_socket.send_string("Sending to sub")
 
-out_str="{\
-    name: 'KRKR - Mic Pod',\
-    count: 2,\
-    maxCount: 7,\
-    img: 'assets/images/devices/pod.png',\
-    thumb: 'assets/images/dashboard/devices/mic-pod-skus-289.png',\
-    devices: [\
-        {\
-            id: '84938463',\
-            status: 'ok',\
-            connected: true,\
-            firmware: '6.3.7',\
-            lastUpdate: '2018-06-15T19:27:46.617Z',\
-            settings: {\
-                volume: getSlider(50),\
-                treble: getSlider(50),\
-                balance: getSlider(50),\
-                bass: getSlider(50),\
-                fader: getSlider(50),\
-            },\
-        },\
-        {\
-            id: '483729743',\
-            status: 'ok',\
-            connected: false,\
-            firmware: '1.01.1',\
-            lastUpdate: '2018-06-15T19:27:46.617Z',\
-            settings: {\
-                volume: getSlider(30),\
-                treble: getSlider(20),\
-                balance: getSlider(60),\
-                bass: getSlider(30),\
-                fader: getSlider(20),\
-            },\
-        },\
-    ],\
-}"
-
-while True:
-    received_message=socket.recv()
-    print(received_message)
-    response_message=out_str
-    print("sending response")
-    pub_socket.send_string(response_message)
-
-
+loop = asyncio.get_event_loop()
+try:
+    asyncio.ensure_future(recvonSub())
+    asyncio.ensure_future(sendtoSub())
+    loop.run_forever()
+except KeyboardInterrupt:
+    pass
+finally:
+    print("Closing Loop")
+    loop.close()
