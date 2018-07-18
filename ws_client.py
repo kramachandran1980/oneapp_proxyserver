@@ -43,8 +43,9 @@ async def hello():
             'ws://172.28.101.247:8765') as websocket:
         while True: 
             await asyncio.sleep(1)
-            message=[0,10,14,10,9,9,0,208,25,37,150,74,118,66,18,1,49,26,2,10,0]
+            message=[0, 10, 14, 10, 9, 9, 0, 144, 105, 105, 166, 74, 118, 66, 18, 1, 49, 26, 2, 10, 0]
             ba=bytes(message)
+            print(ba)
             await websocket.send(ba)
             print(f"> {ba}")
             response = await websocket.recv()

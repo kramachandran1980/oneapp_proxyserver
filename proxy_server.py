@@ -24,6 +24,7 @@ async def ws_connection(websocket, path):
             break
         else:
             print(message)
+            #print(list(message))
             await sendtoSub(message)
 
 async def recvonSub():
