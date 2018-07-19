@@ -1,5 +1,7 @@
 import asyncio
 import websockets
+import transport_pb2 as transport
+from google.protobuf.json_format import MessageToJson
 
 test_str="{\
     name: 'Mic Pod',\
@@ -38,6 +40,16 @@ test_str="{\
         },\
     ],\
 }"
+
+def parse_protobuf(msg):
+    msg_as_list = list(msg)
+    if msg_as_list[0] == 2:
+        print("This is a response messsage")
+        del msg_as_list[0]
+    response = transport.ResponseOK()
+    response.ParseFromString(bytes(msg_as_list))
+    print(response)
+
 async def hello():
     async with websockets.connect(
             'ws://172.28.101.247:8765') as websocket:
@@ -49,7 +61,7 @@ async def hello():
             await websocket.send(ba)
             print(f"> {ba}")
             response = await websocket.recv()
-            print(f"< {response}")
+            parse_protobuf(response)
 
 loop = asyncio.get_event_loop()
 try:
