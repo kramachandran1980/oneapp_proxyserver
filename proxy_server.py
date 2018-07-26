@@ -15,17 +15,22 @@ pub_socket.bind("tcp://127.0.0.1:6666")
 
 connections = set()
 async def ws_connection(websocket, path):
+    connections.add(websocket)
     while True:
         await asyncio.sleep(1)
         print("Third worker Executed")
-        connections.add(websocket)
+        #connections.add(websocket)
         message = await websocket.recv()
         if message is None:
             break
         else:
             print(message)
             #print(list(message))
-            await sendtoSub(message)
+            #sendtoSub(message)
+            print("sending to sub")
+            asyncio.sleep(1)
+            pub_socket.send(message)
+            print("SENT to sub")
 
 async def recvonSub():
     while True:
@@ -36,16 +41,16 @@ async def recvonSub():
         for ws in connections:
             await ws.send(received_msg)
         
-async def sendtoSub(message):
-    while True:
-        await asyncio.sleep(1)
-        print("Second Worker Executed")
-        #await pub_socket.send_string(message)
-        await pub_socket.send(message)
+def sendtoSub(message):
+    #while True:
+    #await asyncio.sleep(1)
+    print("Second Worker Executed")
+    #await pub_socket.send_string(message)
+    pub_socket.send(message)
 
 loop = asyncio.get_event_loop()
 try:
-    start_server = websockets.serve(ws_connection, '172.28.101.247', 8765)
+    start_server = websockets.serve(ws_connection, 'localhost', 8765)
     asyncio.ensure_future(start_server)
     asyncio.ensure_future(recvonSub())
     #asyncio.ensure_future(sendtoSub())
