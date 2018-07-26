@@ -52,7 +52,7 @@ def parse_protobuf(msg):
 
 async def hello():
     async with websockets.connect(
-            'ws://172.28.101.247:8765') as websocket:
+            'ws://localhost:8765') as websocket:
         while True: 
             await asyncio.sleep(1)
             message=[0, 10, 14, 10, 9, 9, 0, 144, 105, 105, 166, 74, 118, 66, 18, 1, 49, 26, 2, 10, 0]
