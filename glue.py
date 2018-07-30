@@ -8,10 +8,12 @@ from google.protobuf.json_format import MessageToJson
 context = zmq.asyncio.Context()
 socket_sub = context.socket(zmq.SUB)
 socket_sub.setsockopt_string(zmq.SUBSCRIBE, "")
-socket_sub.connect("tcp://127.0.0.1:6666")
+#Kartik Local Connection
+socket_sub.connect("tcp://172.28.101.170:6666")
 
 pub_socket=context.socket(zmq.PUB)
-pub_socket.bind("tcp://127.0.0.1:5555")
+#Kartik Local Connection
+pub_socket.bind("tcp://172.28.101.170:5555")
 
 def parse_protobuf(msg):
     msg_as_list = list(msg)
